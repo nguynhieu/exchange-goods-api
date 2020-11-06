@@ -48,14 +48,14 @@ module.exports.login = async (req, res) => {
   const user = await User.findOne({ email: email }).lean();
 
   if (!user) {
-    res.sendStatus(401);
+    res.status(401).send("Người dùng không tồn tại");
     return;
   }
 
   const comparePass = await bcrypt.compare(password, user.password);
 
   if (!comparePass) {
-    res.sendStatus(401);
+    res.status(401).send("Sai mật khẩu, vui lòng nhập lại");
     return;
   }
 
@@ -63,6 +63,7 @@ module.exports.login = async (req, res) => {
     expiresIn: process.env.ACCESS_TOKEN_LIFE_SECRET
   });
 
+  // delete hash password of user for response data to client
   delete user.hashPassword;
   const auth = {
     token,
