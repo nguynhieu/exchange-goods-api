@@ -27,6 +27,10 @@ app.use(bodyParser.json({ limit: "50mb" }));
 mongoose.connect(process.env.MONGODB_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
+}).then(() => {
+  console.log('connected DB')
+}).catch((err) => {
+  console.log(err)
 });
 
 const postRoute = require("./routes/post.route");
