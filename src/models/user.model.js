@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const userSchema = new mongoose.Schema({
   isAdmin: Boolean,
   avatar: String,
@@ -7,7 +8,6 @@ const userSchema = new mongoose.Schema({
   phone: String,
   email: String,
   address: String,
-  myWishList: []
 });
 const User = mongoose.model("User", userSchema);
 

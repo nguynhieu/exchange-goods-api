@@ -2,7 +2,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const saltRounds = 10;
 
-const User = require("../models/user.model");
+const User = require("../../models/user.model");
+const Tour = require("../../models/tour.model");
+const Banner = require("../../models/banner.model");
 
 module.exports.register = async (req, res) => {
   const { username, password, email, phone, address } = req.body;
@@ -70,4 +72,73 @@ module.exports.login = async (req, res) => {
   };
 
   res.status(200).send({ auth });
+};
+
+module.exports.createTour = async (req, res) => {
+  await Tour.insertMany({
+    ...req.body,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  res.status(200).send("Tạo thành công!");
+};
+
+module.exports.updateTour = async (req, res) => {
+  const { tourId } = req.params;
+  const tour = await Tour.updateOne(
+    {
+      _id: tourId,
+    },
+    {
+      ...req.body,
+      updatedAt: new Date(),
+    }
+  );
+
+  res.status(200).send("Cập nhập thành công!");
+};
+
+module.exports.deleteTour = async (req, res) => {
+  const { tourId } = req.params;
+  await Tour.deleteOne({
+    _id: tourId,
+  });
+
+  res.status(200).send("Xóa thành công!");
+};
+
+module.exports.createBanner = async (req, res) => {
+  await Banner.insertMany({
+    ...req.body,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  res.status(200).send("Tạo thành công!");
+};
+
+module.exports.updateBanner = async (req, res) => {
+  const { bannerId } = req.params;
+
+  await Banner.updateOne(
+    {
+      _id: bannerId,
+    },
+    {
+      ...req.body,
+      updatedAt: new Date(),
+    }
+  );
+
+  res.status(200).send("Cập nhập thành công!");
+};
+
+module.exports.deleteBanner = async (req, res) => {
+  const { bannerId } = req.params;
+
+  await Banner.deleteOne({
+    _id: bannerId,
+  });
+
+  res.status(200).send("Xóa thành công!");
 };
