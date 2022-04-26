@@ -28,14 +28,14 @@ module.exports.register = async (req, res) => {
 
   const newUser = {
     isAdmin: false,
+    isBlocked: false,
     username,
     password: hashPassword,
-    myWishList: [],
     email,
     phone,
     address,
     avatar:
-      "http://res.cloudinary.com/reii/image/upload/v1594436630/h5qjpjt5cp5ykxiswycv.png"
+      "http://res.cloudinary.com/reii/image/upload/v1594436630/h5qjpjt5cp5ykxiswycv.png",
   };
 
   await User.insertMany(newUser);
@@ -60,14 +60,14 @@ module.exports.login = async (req, res) => {
   }
 
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_LIFE_SECRET
+    expiresIn: process.env.ACCESS_TOKEN_LIFE_SECRET,
   });
 
   // delete hash password of user for response data to client
   delete user.hashPassword;
   const auth = {
     token,
-    user
+    user,
   };
 
   res.status(200).send({ auth });
