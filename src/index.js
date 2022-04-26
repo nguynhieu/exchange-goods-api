@@ -44,8 +44,8 @@ const notificationRoute = require("./routes/notification.route");
 const chatRoute = require("./routes/chat.route");
 
 const authMiddleware = require("./middlewares/auth.middleware");
+const adminMiddleware = require("./middlewares/admin.middleware");
 
-const apiUserRoute = require("./api/routes/user.route");
 const apiAdminRoute = require("./api/routes/admin.route");
 const apiPostRoute = require("./api/routes/post.route");
 const apiChatRoute = require("./api/routes/chat.route");
@@ -142,9 +142,8 @@ app.use("/chats", authMiddleware, chatRoute);
 app.use("/api/tour", apiTourRoute);
 app.use("/api/banner", apiBannerRoute);
 app.use("/api/bill", apiBillRoute);
-app.use("/api/admin", apiAdminRoute);
+app.use("/api/admin", adminMiddleware, apiAdminRoute);
 app.use("/api/chats", apiChatRoute);
-app.use("/api/users", authMiddleware, apiUserRoute);
 app.use("/api/posts", apiPostRoute);
 app.use("/api/notifications", apiNotificationRoute);
 

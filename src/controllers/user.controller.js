@@ -4,12 +4,12 @@ module.exports.addWishlist = async (req, res) => {
   const { wishlist, user } = req.body;
   await User.updateOne(
     {
-      _id: user._id
+      _id: user._id,
     },
     {
       $push: {
-        myWishList: wishlist
-      }
+        myWishList: wishlist,
+      },
     }
   );
 
@@ -22,17 +22,17 @@ module.exports.deleteItem = async (req, res) => {
 
   await User.updateOne(
     {
-      _id: user._id
+      _id: user._id,
     },
     {
       $set: {
-        myWishList: wishlist
-      }
+        myWishList: wishlist,
+      },
     }
   );
 
   const userAfterUpdate = await User.findOne({
-    _id: user._id
+    _id: user._id,
   });
   res.status(200).send({ userAfterUpdate });
 };

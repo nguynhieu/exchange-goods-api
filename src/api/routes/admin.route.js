@@ -1,20 +1,34 @@
 const router = require("express").Router();
+const multer = require("multer");
+const upload = multer({ dest: "src/public/uploads/" });
 
 const adminController = require("../controllers/admin.controller");
 
-router.post("/register", adminController.register);
+router.get("/user", adminController.getUser);
 
-router.post("/login", adminController.login);
+router.get("/user/:userId", adminController.getUserById);
 
-router.post("/tour", adminController.createTour);
+router.put("/user/:userId", adminController.updateUser);
 
-router.put("/tour/:tourId", adminController.updateTour);
+router.delete("/user/:userId", adminController.deleteUser);
+
+router.post("/tour", upload.array("photos", 6), adminController.createTour);
+
+router.put(
+  "/tour/:tourId",
+  upload.array("photos", 6),
+  adminController.updateTour
+);
 
 router.delete("/tour/:tourId", adminController.deleteTour);
 
-router.post("/banner", adminController.createBanner);
+router.post("/banner", upload.array("photos", 6), adminController.createBanner);
 
-router.put("/banner/:bannerId", adminController.updateBanner);
+router.put(
+  "/banner/:bannerId",
+  upload.array("photos", 6),
+  adminController.updateBanner
+);
 
 router.delete("/banner/:bannerId", adminController.deleteBanner);
 

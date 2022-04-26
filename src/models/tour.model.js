@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const tourSchema = new mongoose.Schema({
   updatedAt: Date,
   createdAt: Date,
-  image: String,
+  images: Array,
   title: String,
   description: String,
   location: String,

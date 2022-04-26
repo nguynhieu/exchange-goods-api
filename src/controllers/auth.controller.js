@@ -28,6 +28,7 @@ module.exports.register = async (req, res) => {
 
   const newUser = {
     isAdmin: false,
+    isBlocked: false,
     username,
     password: hashPassword,
     email,

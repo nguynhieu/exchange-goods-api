@@ -1,82 +1,82 @@
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const saltRounds = 10;
+const cloudinary = require("cloudinary").v2;
 
 const User = require("../../models/user.model");
 const Tour = require("../../models/tour.model");
 const Banner = require("../../models/banner.model");
 
-module.exports.register = async (req, res) => {
-  const { username, password, email, phone, address } = req.body;
-  const isExistedUser = await User.findOne({ username: username });
-  const isExistedemail = await User.findOne({ email: email });
+module.exports.getUser = async (req, res) => {
+  let { page = 1, limit = 10 } = req.query;
+  page = Number(page);
+  limit = Number(limit);
 
-  if (isExistedUser) {
-    res.status(401).send("User has already exists");
-    return;
-  }
+  const users = await User.find()
+    .skip((page - 1) * limit)
+    .limit(limit);
 
-  if (isExistedemail) {
-    res.status(401).send("Email already in use");
-    return;
-  }
+  const total = await User.find().count();
 
-  if (phone.length !== 10 || phone.indexOf(0) !== 0) {
-    res.status(401).send("Phone number incorrect");
-    return;
-  }
-
-  const hashPassword = await bcrypt.hash(password, saltRounds);
-
-  const newUser = {
-    isAdmin: false,
-    username,
-    password: hashPassword,
-    email,
-    phone,
-    address,
-    avatar:
-      "http://res.cloudinary.com/reii/image/upload/v1594436630/h5qjpjt5cp5ykxiswycv.png",
-  };
-
-  await User.insertMany(newUser);
-
-  res.sendStatus(200);
+  res.status(200).send({
+    data: users,
+    pagination: {
+      page,
+      limit,
+      total,
+    },
+  });
 };
 
-module.exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email: email }).lean();
-
-  if (!user) {
-    res.status(401).send("Người dùng không tồn tại");
-    return;
-  }
-
-  const comparePass = await bcrypt.compare(password, user.password);
-
-  if (!comparePass) {
-    res.status(401).send("Sai mật khẩu, vui lòng nhập lại");
-    return;
-  }
-
-  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: process.env.ACCESS_TOKEN_LIFE_SECRET,
+module.exports.getUserById = async (req, res) => {
+  const user = await User.findOne({
+    _id: req.params.userId,
   });
 
-  // delete hash password of user for response data to client
-  delete user.hashPassword;
-  const auth = {
-    token,
-    user,
-  };
+  res.status(200).send({
+    data: user,
+  });
+};
 
-  res.status(200).send({ auth });
+module.exports.updateUser = async (req, res) => {
+  await User.updateOne(
+    {
+      _id: req.params.userId,
+    },
+    {
+      ...req.body,
+      updatedAt: new Date(),
+    }
+  );
+
+  res.status(200).send("Cap nhap thanh cong!");
+};
+
+module.exports.deleteUser = async (req, res) => {
+  await User.deleteOne({
+    _id: req.params.userId,
+  });
+
+  res.status(200).send("Xóa thành công!");
 };
 
 module.exports.createTour = async (req, res) => {
+  const urls = [];
+  const { files } = req.body;
+
+  // check if files is an array
+  if (files && typeof files === "object") {
+    for (const file of files) {
+      const { url } = await cloudinary.uploader.upload(file.path);
+      urls.push(url);
+    }
+  }
+  // if files is a string
+  else if (files) {
+    const { url } = await cloudinary.uploader.upload(files);
+    urls.push(url);
+  }
+
   await Tour.insertMany({
     ...req.body,
+    images: urls,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
@@ -85,12 +85,29 @@ module.exports.createTour = async (req, res) => {
 
 module.exports.updateTour = async (req, res) => {
   const { tourId } = req.params;
-  const tour = await Tour.updateOne(
+  const urls = [];
+  const { files } = req;
+
+  // check if files is an array
+  if (files && typeof files === "object") {
+    for (const file of files) {
+      const { url } = await cloudinary.uploader.upload(file.path);
+      urls.push(url);
+    }
+  }
+  // if files is a string
+  else if (files) {
+    const { url } = await cloudinary.uploader.upload(files);
+    urls.push(url);
+  }
+
+  await Tour.updateOne(
     {
       _id: tourId,
     },
     {
       ...req.body,
+      ...(urls.length ? { images: urls } : {}),
       updatedAt: new Date(),
     }
   );
@@ -108,8 +125,25 @@ module.exports.deleteTour = async (req, res) => {
 };
 
 module.exports.createBanner = async (req, res) => {
+  const urls = [];
+  const { files } = req;
+
+  // check if files is an array
+  if (files && typeof files === "object") {
+    for (const file of files) {
+      const { url } = await cloudinary.uploader.upload(file.path);
+      urls.push(url);
+    }
+  }
+  // if files is a string
+  else if (files) {
+    const { url } = await cloudinary.uploader.upload(files);
+    urls.push(url);
+  }
+
   await Banner.insertMany({
     ...req.body,
+    images: urls,
     createdAt: new Date(),
     updatedAt: new Date(),
   });
@@ -120,12 +154,29 @@ module.exports.createBanner = async (req, res) => {
 module.exports.updateBanner = async (req, res) => {
   const { bannerId } = req.params;
 
+  const urls = [];
+  const { files } = req;
+
+  // check if files is an array
+  if (files && typeof files === "object") {
+    for (const file of files) {
+      const { url } = await cloudinary.uploader.upload(file.path);
+      urls.push(url);
+    }
+  }
+  // if files is a string
+  else if (files) {
+    const { url } = await cloudinary.uploader.upload(files);
+    urls.push(url);
+  }
+
   await Banner.updateOne(
     {
       _id: bannerId,
     },
     {
       ...req.body,
+      ...(urls.length ? { images: urls } : {}),
       updatedAt: new Date(),
     }
   );

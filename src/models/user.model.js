@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
   phone: String,
   email: String,
   address: String,
+  isBlocked: Boolean,
 });
 const User = mongoose.model("User", userSchema);
 
