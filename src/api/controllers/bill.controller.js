@@ -1,4 +1,5 @@
 const Bill = require("../../models/bill.model");
+const Tour = require("../../models/tour.model");
 
 const BILL_STATUSES = ["PAID", "UNPAID"];
 
@@ -24,12 +25,35 @@ module.exports.getBill = async (req, res) => {
 };
 
 module.exports.createBill = async (req, res) => {
+  const tour = await Tour.findOne({
+    _id: req.body.tourId,
+  });
+
+  if (!tour) {
+    return res.status(404).send("Không tìm thấy tour!");
+  }
+
+  if (tour.availableSlot < req.body.slot) {
+    return res
+      .status(400)
+      .send(`Số chỗ còn lại chỉ còn ${tour.availableSlot}!`);
+  }
+
   await Bill.insertMany({
     ...req.body,
     status: BILL_STATUSES[1],
     createdAt: new Date(),
     updatedAt: new Date(),
   });
+
+  await Tour.updateOne(
+    {
+      _id: req.body.tourId,
+    },
+    {
+      availableSlot: tour.availableSlot - req.body.slot,
+    }
+  );
 
   res.status(200).send("Tạo thành công!");
 };
