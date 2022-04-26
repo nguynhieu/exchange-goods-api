@@ -42,6 +42,7 @@ const userRoute = require("./routes/user.route");
 const exchangeRoute = require("./routes/exchange.route");
 const notificationRoute = require("./routes/notification.route");
 const chatRoute = require("./routes/chat.route");
+const apiUserRoute = require("./api/routes/user.route");
 
 const authMiddleware = require("./middlewares/auth.middleware");
 const adminMiddleware = require("./middlewares/admin.middleware");
@@ -146,6 +147,7 @@ app.use("/api/admin", adminMiddleware, apiAdminRoute);
 app.use("/api/chats", apiChatRoute);
 app.use("/api/posts", apiPostRoute);
 app.use("/api/notifications", apiNotificationRoute);
+app.use("/api/users", apiUserRoute);
 
 http.listen(PORT, () => {
   console.log(`Server has run on port ${PORT}`);
