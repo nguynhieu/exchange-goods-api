@@ -59,7 +59,7 @@ module.exports.deleteUser = async (req, res) => {
 
 module.exports.createTour = async (req, res) => {
   const urls = [];
-  const { files } = req.body;
+  const { files } = req;
 
   // check if files is an array
   if (files && typeof files === "object") {
@@ -153,7 +153,6 @@ module.exports.createBanner = async (req, res) => {
 
 module.exports.updateBanner = async (req, res) => {
   const { bannerId } = req.params;
-
   const urls = [];
   const { files } = req;
 

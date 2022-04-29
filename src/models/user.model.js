@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
+const schema = {
   isAdmin: Boolean,
   avatar: String,
   username: String,
@@ -9,7 +9,10 @@ const userSchema = new mongoose.Schema({
   email: String,
   address: String,
   isBlocked: Boolean,
-});
+};
+
+const userSchema = new mongoose.Schema(schema);
 const User = mongoose.model("User", userSchema);
 
+module.exports.schema = schema;
 module.exports = User;

@@ -52,6 +52,11 @@ module.exports.login = async (req, res) => {
     return;
   }
 
+  if (user.isBlocked) {
+    res.status(403).send("Người dùng đã bị chặn!");
+    return;
+  }
+
   const comparePass = await bcrypt.compare(password, user.password);
 
   if (!comparePass) {

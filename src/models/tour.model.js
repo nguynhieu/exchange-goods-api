@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const tourSchema = new mongoose.Schema({
+const schema = {
   updatedAt: Date,
   createdAt: Date,
   images: Array,
@@ -12,7 +12,10 @@ const tourSchema = new mongoose.Schema({
   departureTime: Date,
   transport: String,
   availableSlot: Number,
-});
+};
+
+const tourSchema = new mongoose.Schema(schema);
 const Tour = mongoose.model("Tour", tourSchema);
 
+module.exports.schema = schema;
 module.exports = Tour;

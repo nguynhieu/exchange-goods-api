@@ -1,5 +1,6 @@
 const Bill = require("../../models/bill.model");
 const Tour = require("../../models/tour.model");
+const User = require("../../models/user.model");
 
 const BILL_STATUSES = ["PAID", "UNPAID"];
 
@@ -28,9 +29,16 @@ module.exports.createBill = async (req, res) => {
   const tour = await Tour.findOne({
     _id: req.body.tourId,
   });
+  const user = await User.findOne({
+    _id: req.body.userId,
+  });
 
   if (!tour) {
     return res.status(404).send("Không tìm thấy tour!");
+  }
+
+  if (!user) {
+    return res.status(404).send("Không tìm thấy người dùng!");
   }
 
   if (tour.availableSlot < req.body.slot) {
@@ -41,6 +49,8 @@ module.exports.createBill = async (req, res) => {
 
   await Bill.insertMany({
     ...req.body,
+    tour,
+    user,
     status: BILL_STATUSES[1],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -77,6 +87,7 @@ module.exports.updateBill = async (req, res) => {
 
 module.exports.deleteBill = async (req, res) => {
   const { billId } = req.params;
+
   await Bill.deleteOne({
     _id: billId,
   });
