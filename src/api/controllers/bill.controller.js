@@ -120,27 +120,22 @@ module.exports.updateBill = async (req, res) => {
 module.exports.deleteBill = async (req, res) => {
   const { billId } = req.params;
 
+  const bill = await Bill.findOne({
+    _id: billId,
+  });
+
   await Bill.deleteOne({
     _id: billId,
   });
 
-  const date = new Date();
+  const date = new Date(bill.createdAt);
   const year = date.getFullYear();
   const month = date.getMonth();
 
-  const statist = await Statistical.findOne({
-    year,
-  });
-
-  if (!statist) {
-    const data = generateStatistical(year, month);
-    await Statistical.insertMany(data);
-  } else {
-    await Statistical.updateOne(
-      { year, "statistics.month": month },
-      { $inc: { "statistics.$.total": 1 } }
-    );
-  }
+  await Statistical.updateOne(
+    { year, "statistics.month": month },
+    { $inc: { "statistics.$.total": -1 } }
+  );
 
   res.status(200).send("Xóa thành công!");
 };
