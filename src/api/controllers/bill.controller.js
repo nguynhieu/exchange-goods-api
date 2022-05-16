@@ -1,8 +1,21 @@
 const Bill = require("../../models/bill.model");
 const Tour = require("../../models/tour.model");
 const User = require("../../models/user.model");
+const Statistical = require("../../models/statistical.model");
 
 const BILL_STATUSES = ["PAID", "UNPAID"];
+
+const generateStatistical = (year, month) => {
+  const months = Array.from(Array(12).keys());
+
+  return {
+    year,
+    statistics: months.map((m) => ({
+      month: m,
+      total: m === month ? 1 : 0,
+    })),
+  };
+};
 
 module.exports.getBill = async (req, res) => {
   let { page = 1, limit = 10 } = req.query;
@@ -47,13 +60,33 @@ module.exports.createBill = async (req, res) => {
       .send(`Số chỗ còn lại chỉ còn ${tour.availableSlot}!`);
   }
 
+  // await Statistical.deleteMany();
+
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  const statist = await Statistical.findOne({
+    year,
+  });
+
+  if (!statist) {
+    const data = generateStatistical(year, month);
+    await Statistical.insertMany(data);
+  } else {
+    await Statistical.updateOne(
+      { year, "statistics.month": month },
+      { $inc: { "statistics.$.total": 1 } }
+    );
+  }
+
   await Bill.insertMany({
     ...req.body,
     tour,
     user,
     status: BILL_STATUSES[1],
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: date,
+    updatedAt: date,
   });
 
   await Tour.updateOne(
@@ -91,6 +124,15 @@ module.exports.deleteBill = async (req, res) => {
   await Bill.deleteOne({
     _id: billId,
   });
+
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth();
+
+  await Statistical.updateOne(
+    { year, "statistics.month": month },
+    { $inc: { "statistics.total": -1 } }
+  );
 
   res.status(200).send("Xóa thành công!");
 };

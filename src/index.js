@@ -54,6 +54,7 @@ const apiNotificationRoute = require("./api/routes/notification.route");
 const apiTourRoute = require("./api/routes/tour.route");
 const apiBannerRoute = require("./api/routes/banner.route");
 const apiBillRoute = require("./api/routes/bill.route");
+const apiStatisticalRoute = require("./api/routes/statistical.route");
 
 app.get("/", (req, res) => {
   res.send("ok3 nka");
@@ -140,6 +141,7 @@ app.use("/exchanges", exchangeRoute);
 app.use("/notifications", authMiddleware, notificationRoute);
 app.use("/chats", authMiddleware, chatRoute);
 
+app.use("/api/statistical", apiStatisticalRoute);
 app.use("/api/tour", apiTourRoute);
 app.use("/api/banner", apiBannerRoute);
 app.use("/api/bill", apiBillRoute);
