@@ -61,7 +61,6 @@ module.exports.createBill = async (req, res) => {
   }
 
   // await Statistical.deleteMany();
-
   const date = new Date();
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -129,10 +128,19 @@ module.exports.deleteBill = async (req, res) => {
   const year = date.getFullYear();
   const month = date.getMonth();
 
-  await Statistical.updateOne(
-    { year, "statistics.month": month },
-    { $inc: { "statistics.total": -1 } }
-  );
+  const statist = await Statistical.findOne({
+    year,
+  });
+
+  if (!statist) {
+    const data = generateStatistical(year, month);
+    await Statistical.insertMany(data);
+  } else {
+    await Statistical.updateOne(
+      { year, "statistics.month": month },
+      { $inc: { "statistics.$.total": 1 } }
+    );
+  }
 
   res.status(200).send("Xóa thành công!");
 };
